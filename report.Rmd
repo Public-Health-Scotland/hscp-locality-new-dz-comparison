@@ -1,0 +1,265 @@
+---
+title: "Comparing HSCP populations based on 2011 and 2022 datazone boundaries"
+output: 
+  html_document:
+    theme:
+      bslib: true
+      primary: "#3F3685"
+      secondary: "#9B4393"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+
+library(bslib)
+library(openxlsx2)
+library(tidyverse)
+library(DT)
+
+locality_demographics <- read_rds("temp/locality_demographics.rds")
+locality_admissions <- read_rds("temp/locality_admissions.rds")
+
+hscps <- unique(locality_demographics$hscp2019name)
+
+panels <- function(plots, names){
+  map2(
+    plots, names,
+    \(plot, name){
+      if(inherits(plot, "ggplot")) plot <- ggiraph::girafe(plot)
+      nav_panel(name, plot)
+    }
+  )
+}
+
+dropdown <- function(menu_name, panels){
+    nav_menu(
+      title = menu_name,
+      !!!panels
+    )
+}
+```
+
+  
+# Total population
+  
+
+```{r}
+
+plots <- hscps |>
+  map(
+    \(x){
+      locality_demographics |>
+        filter(
+          hscp2019name == x,
+          sex == "all"
+        ) |>
+        ggplot(aes(x = year, y = total_pop, colour = dz_version, group = dz_version)) +
+        geom_line() +
+        scale_color_discrete(palette = phsstyles::phs_colour_values) +
+        scale_x_continuous(
+          breaks = seq(2011, 2024, 5),
+          minor_breaks = seq(2011, 2024)
+        ) +
+        facet_wrap(~hscp_locality) +
+        labs(
+          title = paste(x, "locality population estimates"),
+          colour = "Datazone boundaries",
+          y = "Population",
+          x = "Year"
+        ) +
+        phsstyles::theme_phs()+
+        theme(
+          panel.grid.major.y = ggplot2::element_line(color = "grey90"),
+          panel.grid.minor.x = ggplot2::element_line(color = "grey90")
+        )}
+  )
+
+
+navset_pill(!!!panels(plots, names = hscps))
+
+```
+
+```{r}
+
+locality_demographics |>
+  filter(sex == "all") |>
+  select(Year = year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, total_pop) |>
+  pivot_wider(values_from = total_pop, names_from = dz_version) |>
+  datatable(rownames = FALSE,
+            extensions = 'Buttons',
+            options = list(
+              dom = 'frtipB',
+              buttons = c('copy', list(
+                extend = 'collection',
+                buttons = c('csv', 'excel', 'pdf'),
+                text = 'Download'
+              )
+              ))
+            )
+```
+
+
+  
+# Locality demographics
+  
+
+```{r}
+
+localities <- hscps |>
+  map(~locality_demographics |>
+        filter(hscp2019name == .x) |>
+        pull(hscp_locality) |>
+        unique()) |>
+  set_names(hscps)
+
+
+plot_by_age <- function(locality){
+  locality_demographics |>
+    filter(
+      hscp_locality == locality,
+      sex != "all"
+    ) |>
+    pivot_longer(
+      cols = age_under_18:age_65_plus,
+      names_to = "age_group",
+      values_to = "population"
+    ) |>
+    mutate(
+      age_group = factor(
+        age_group,
+        levels = c("age_under_18", "age_18_to_64", "age_65_plus"),
+        labels = c("Age under 18", "Age 18 to 64", "Age 65+")
+      )
+    ) |>
+    ggplot(aes(x = year, y = population, colour = dz_version, group = dz_version)) +
+    geom_line() +
+    scale_color_discrete(palette = phsstyles::phs_colour_values) +
+    scale_x_continuous( 
+      breaks = seq(2011, 2024, 5),
+      minor_breaks = seq(2011, 2024)
+    ) +
+    facet_grid(
+      sex~age_group,
+      labeller = labeller(
+        age_group = c(
+          age_under_18 = "Age under 18",
+          age_18_to_64 = "Age 18 to 64",
+          age_65_plus = "Age 65+"
+        ),
+        sex = str_to_title
+      )
+    ) +
+    labs(
+      title = paste0(locality, " locality population estimates by age and sex"),
+      colour = NULL,
+      y = "Population",
+      x = "Year"
+    ) +
+    phsstyles::theme_phs() +
+    theme(
+      panel.grid.major.y = ggplot2::element_line(color = "grey90"),
+      panel.grid.minor.x = ggplot2::element_line(color = "grey90")
+    )
+}
+
+plots <- map(localities,  ~map(.x, plot_by_age))
+
+navset_pill(
+  !!!map(
+    hscps,
+    ~dropdown(.x, panels(plots[[.x]], localities[[.x]]))
+  )
+)
+
+```
+
+```{r}
+locality_demographics |>
+  filter(sex == "all") |>
+      pivot_longer(
+        cols = age_under_18:age_65_plus,
+        names_to = "age_group",
+        values_to = "population"
+      ) |>
+      mutate(
+        age_group = factor(
+          age_group,
+          levels = c("age_under_18", "age_18_to_64", "age_65_plus"),
+          labels = c("Age under 18", "Age 18 to 64", "Age 65+")
+        )
+      ) |>
+  select(Year = year, "HSCP" = hscp2019name, "Locality" = hscp_locality, "Age group" = age_group, dz_version, population) |>
+  pivot_wider(values_from = population, names_from = dz_version) |>
+  datatable(rownames = FALSE,
+            extensions = 'Buttons',
+            options = list(
+              dom = 'frtipB',
+              buttons = c('copy', 'csv')
+            ))
+```
+
+  
+# Emergency hospital admission rate
+  
+
+```{r}
+plots <- map(
+  hscps,
+  \(x){
+    locality_admissions |>
+      filter(
+        hscp2019name == x
+      ) |>
+      ggplot(aes(x = year, y = admissions_per_1k, colour = dz_version, group = dz_version)) +
+      geom_line() +
+      scale_color_discrete(palette = phsstyles::phs_colour_values) +
+      scale_x_continuous( 
+        breaks = seq(2011, 2024, 5),
+        minor_breaks = seq(2011, 2024),
+        labels =\(x = seq(2011, 2024, 5)) paste(x, x-2000+1, sep= "/")
+      ) +
+      facet_wrap(~hscp_locality) +
+      labs(
+        title = paste(x, "locality emergency admission rates"),
+        colour = "Datazone boundaries",
+        y = "Emergency hospital admissions per 1000 people",
+        x = "Financial year"
+      ) +
+      phsstyles::theme_phs()+
+      theme(
+        panel.grid.major.y = ggplot2::element_line(color = "grey90"),
+        panel.grid.minor.x = ggplot2::element_line(color = "grey90")
+      )
+  }
+)
+
+navset_pill(!!!panels(plots, names = hscps))
+```
+
+```{r}
+locality_admissions |>
+  mutate(fin_year = (\(x) paste(x, x-2000+1, sep= "/"))(year)) |>
+  select(Year = fin_year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, "Admissions" = admissions, "Rate per 1000" = admissions_per_1k) |>
+  pivot_wider(values_from = c(Admissions, `Rate per 1000`), names_from = dz_version,
+              names_sep = ", ") |>
+  datatable(rownames = FALSE,
+            extensions = 'Buttons',
+            options = list(
+              dom = 'frtipB',
+              buttons = c('copy', list(
+                extend = 'collection',
+                buttons = c('csv', 'excel', 'pdf'),
+                text = 'Download'
+              )
+              ))
+  ) %>%
+  formatRound(
+    columns = 6:7,
+    digits = 1
+  )
+```
