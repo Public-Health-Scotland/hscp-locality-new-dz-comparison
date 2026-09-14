@@ -51,5 +51,7 @@ admissions_DZ22 <- admissions_by_locality(smr_admissions, lookup_DZ22, join_by =
 locality_admissions <- combine_dz(admissions_DZ11, admissions_DZ22) %>%
   filter(!is.na(hscp_locality))
 
+locality_admissions <- admission_rate(locality_admissions, locality_demographics)
+
 # save to temp folder
 saveRDS(locality_admissions, "temp/locality_admissions.rds")
