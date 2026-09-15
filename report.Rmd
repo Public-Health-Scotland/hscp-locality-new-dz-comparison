@@ -2,6 +2,9 @@
 title: "Comparing HSCP populations based on 2011 and 2022 datazone boundaries"
 output: 
   html_document:
+    self_contained: TRUE
+    toc: TRUE
+    toc_float: TRUE
     theme:
       bslib: true
       primary: "#3F3685"
@@ -90,17 +93,28 @@ locality_demographics |>
   filter(sex == "all") |>
   select(Year = year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, total_pop) |>
   pivot_wider(values_from = total_pop, names_from = dz_version) |>
+  mutate(
+    HSCP = factor(HSCP),
+    Locality = factor(Locality),
+    Change = (`2022 datazones` - `2011 datazones`),
+    `% change` = Change / `2011 datazones`) |>
   datatable(rownames = FALSE,
+            filter = "top",
             extensions = 'Buttons',
             options = list(
-              dom = 'frtipB',
-              buttons = c('copy', list(
-                extend = 'collection',
-                buttons = c('csv', 'excel', 'pdf'),
-                text = 'Download'
-              )
-              ))
+              dom = 'rtipB',
+              buttons = 
+                list('copy', 'print', list(
+                  extend = 'collection',
+                  buttons = c('csv', 'excel', 'pdf'),
+                  text = 'Download'
+                ))
             )
+  ) |>
+formatPercentage(
+columns = "% change",
+digits = 2
+)
 ```
 
 
@@ -195,12 +209,29 @@ locality_demographics |>
       ) |>
   select(Year = year, "HSCP" = hscp2019name, "Locality" = hscp_locality, "Age group" = age_group, dz_version, population) |>
   pivot_wider(values_from = population, names_from = dz_version) |>
+  mutate(
+    HSCP = factor(HSCP),
+    Locality = factor(Locality),
+    `Age group` = factor(`Age group`),
+    Change = (`2022 datazones` - `2011 datazones`),
+    `% change` = Change / `2011 datazones`) |>
   datatable(rownames = FALSE,
+            filter = "top",
             extensions = 'Buttons',
             options = list(
-              dom = 'frtipB',
-              buttons = c('copy', 'csv')
-            ))
+              dom = 'rtipB',
+              buttons = 
+                list('copy', 'print', list(
+                  extend = 'collection',
+                  buttons = c('csv', 'excel', 'pdf'),
+                  text = 'Download'
+                ))
+            )
+  ) |>
+formatPercentage(
+columns = "% change",
+digits = 2
+)
 ```
 
   
@@ -247,16 +278,23 @@ locality_admissions |>
   select(Year = fin_year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, "Admissions" = admissions, "Rate per 1000" = admissions_per_1k) |>
   pivot_wider(values_from = c(Admissions, `Rate per 1000`), names_from = dz_version,
               names_sep = ", ") |>
+  mutate(
+    Year = factor(Year),
+    HSCP = factor(HSCP),
+    Locality = factor(Locality)
+    ) |>
   datatable(rownames = FALSE,
+            filter = "top",
             extensions = 'Buttons',
             options = list(
-              dom = 'frtipB',
-              buttons = c('copy', list(
-                extend = 'collection',
-                buttons = c('csv', 'excel', 'pdf'),
-                text = 'Download'
-              )
-              ))
+              dom = 'rtipB',
+              buttons = 
+                list('copy', 'print', list(
+                  extend = 'collection',
+                  buttons = c('csv', 'excel', 'pdf'),
+                  text = 'Download'
+                ))
+            )
   ) %>%
   formatRound(
     columns = 6:7,
