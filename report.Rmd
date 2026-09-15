@@ -1,5 +1,6 @@
 ---
-title: "Comparing HSCP populations based on 2011 and 2022 datazone boundaries"
+title: "Comparing HSCP localities based on 2011 and 2022 data zone boundaries"
+author: PHS Local Intelligence Support Team (LIST)
 output: 
   html_document:
     self_contained: TRUE
@@ -10,7 +11,6 @@ output:
       primary: "#3F3685"
       secondary: "#9B4393"
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -47,9 +47,11 @@ dropdown <- function(menu_name, panels){
 }
 ```
 
-  
+Following the 2022 Census, the Scottish Government revised Scotland's data zone geography to reflect changes in population distribution and local boundaries. Because HSCP localities are commonly defined as groups of data zones, changes to data zone boundaries can alter the population and characteristics assigned to each locality, even where the locality names and underlying service structures remain unchanged. The purpose of this report is to quantify the impact of moving from localities based on 2011 data zones to those based on 2022 data zones.
+
 # Total population
-  
+
+Changes to data zone boundaries can result in residents being reassigned between neighbouring localities. This section compares the total population assigned to each locality using 2011 and 2022 data zone definitions.
 
 ```{r}
 
@@ -117,10 +119,11 @@ digits = 2
 )
 ```
 
+> *Data from NRS small area population estimates*
 
-  
 # Locality demographics
-  
+
+Changes in locality boundaries may affect not only overall population size but also the age profile and demographic characteristics of an area. This section examines how the transition to 2022 data zones alters the age and sex composition of localities.
 
 ```{r}
 
@@ -234,9 +237,11 @@ digits = 2
 )
 ```
 
-  
-# Emergency hospital admission rate
-  
+> *Data from NRS small area population estimates*
+
+# Emergency hospital admissions
+
+The impact of changing locality boundaries is not limited to population and demographic measures. Many indicators used in routine reporting are calculated by assigning events, such as hospital admissions, to localities and combining these with population denominators. Emergency hospital admission rates are included as an illustrative example to demonstrate how changes in locality definitions can affect reported outcome measures.
 
 ```{r}
 plots <- map(
@@ -301,3 +306,5 @@ locality_admissions |>
     digits = 1
   )
 ```
+
+> *Data from SMR-01*
