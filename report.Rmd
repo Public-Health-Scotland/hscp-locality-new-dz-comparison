@@ -48,11 +48,17 @@ dropdown <- function(menu_name, panels){
 }
 ```
 
-Following the 2022 Census, the Scottish Government revised Scotland's data zone geography to reflect changes in population distribution and local boundaries. Because HSCP localities are commonly defined as groups of data zones, changes to data zone boundaries can alter the population and characteristics assigned to each locality, even where the locality names and underlying service structures remain unchanged. The purpose of this report is to quantify the impact of moving from localities based on 2011 data zones to those based on 2022 data zones.
+Datazones are used as the building block to aggregate to HSCP Locality level data. HSCP Locality boundaries can cross datazones boundaries, and datazones can straddle more than one HSCP locality on the ground. Datazones are assigned to one HSCP Locality, for datazones that cross HSCP localities these are assigned on a “best-fit basis”.
+
+Following the 2022 Census, the Scottish Government revised Scotland’s datazone boundaries to reflect changes in population distribution and local boundaries.
+
+These changes to datazone boundaries can alter the population and characteristics assigned to each HSCP Locality, even where the locality names and underlying service structures remain unchanged. The purpose of this report is to quantify the impact of moving from HJSCP Localities based on best-fit 2011 datazones to those based on best-fit 2022 datazones.
+
+Further details on datazones can be found [here](https://blogs.gov.scot/statistics/2024/12/16/updates-to-data-zones-and-intermediate-zones-now-published/ "Updates to Data Zones and Intermediate Zones now published - Scottish Government").
 
 # Total population
 
-Changes to data zone boundaries can result in residents being reassigned between neighbouring localities. This section compares the total population assigned to each locality using 2011 and 2022 data zone definitions.
+Changes to datazone boundaries can result in residents being reassigned between neighbouring HSCP Localities. This section compares the total population assigned to each HSCP Locality on a best-fit basis, using the latest available small area population estimates (SAPE) for 2011 datazones and 2022 datazones.
 
 ```{r}
 
@@ -312,6 +318,7 @@ locality_admissions |>
 ```
 
 ### Admission rate per 1000 people
+
 ```{r}
 locality_admissions |>
   mutate(fin_year = (\(x) paste(x, x-2000+1, sep= "/"))(year)) |>
