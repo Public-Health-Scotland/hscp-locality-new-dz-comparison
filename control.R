@@ -1,3 +1,11 @@
+# setup -------------------------------------------------------------------
+
+### Define HSCPS
+hscps <- c(
+  "North Lanarkshire",
+  "South Lanarkshire"
+)
+
 ### Load packages
 pacman::p_load(
   tidyverse,
@@ -11,11 +19,8 @@ pacman::p_load(
 list.files("functions", full.names = T) |>
   walk(source)
 
-### Define HSCPS
-hscps <- c(
-  "North Lanarkshire",
-  "South Lanarkshire"
-)
+### create temp folder
+if (!dir.exists("temp")) dir.create("temp")
 
 # lookup ------------------------------------------------------------------
 
@@ -55,3 +60,13 @@ locality_admissions <- admission_rate(locality_admissions, locality_demographics
 
 # save to temp folder
 saveRDS(locality_admissions, "temp/locality_admissions.rds")
+
+# produce report ----------------------------------------------------------
+
+### knit rmd
+rmarkdown::render("report.Rmd",
+  output_file = "Locality datazone changes report.html"
+)
+
+### OPTIONAL - clear temp directory
+# file.remove(list.files("temp", full.names = T))
