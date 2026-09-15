@@ -5,6 +5,7 @@ output:
   html_document:
     self_contained: TRUE
     toc: TRUE
+    toc_depth: 1
     toc_float: TRUE
     theme:
       bslib: true
@@ -277,16 +278,51 @@ plots <- map(
 navset_pill(!!!panels(plots, names = hscps))
 ```
 
+### Admissions (counts)
+
 ```{r}
 locality_admissions |>
   mutate(fin_year = (\(x) paste(x, x-2000+1, sep= "/"))(year)) |>
-  select(Year = fin_year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, "Admissions" = admissions, "Rate per 1000" = admissions_per_1k) |>
-  pivot_wider(values_from = c(Admissions, `Rate per 1000`), names_from = dz_version,
-              names_sep = ", ") |>
+  select(Year = fin_year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, "Admissions" = admissions) |>
+  pivot_wider(values_from = c(Admissions), names_from = dz_version) |>
   mutate(
     Year = factor(Year),
     HSCP = factor(HSCP),
-    Locality = factor(Locality)
+    Locality = factor(Locality),
+    `Change` = (`2022 datazones` - `2011 datazones`),
+    `% change` = `Change` / `2011 datazones`
+    ) |>
+  datatable(rownames = FALSE,
+            filter = "top",
+            extensions = 'Buttons',
+            options = list(
+              dom = 'rtipB',
+              buttons = 
+                list('copy', 'print', list(
+                  extend = 'collection',
+                  buttons = c('csv', 'excel', 'pdf'),
+                  text = 'Download'
+                ))
+            )
+  ) %>%
+  formatPercentage(
+    columns = "% change",
+    digits = 2
+  )
+```
+
+### Admission rate per 1000 people
+```{r}
+locality_admissions |>
+  mutate(fin_year = (\(x) paste(x, x-2000+1, sep= "/"))(year)) |>
+  select(Year = fin_year, "HSCP" = hscp2019name, "Locality" = hscp_locality, dz_version, "Rate per 1000" = admissions_per_1k) |>
+  pivot_wider(values_from = c(`Rate per 1000`), names_from = dz_version) |>
+  mutate(
+    Year = factor(Year),
+    HSCP = factor(HSCP),
+    Locality = factor(Locality),
+    `Change` = (`2022 datazones` - `2011 datazones`),
+    `% change` = `Change` / `2011 datazones`
     ) |>
   datatable(rownames = FALSE,
             filter = "top",
@@ -302,8 +338,12 @@ locality_admissions |>
             )
   ) %>%
   formatRound(
-    columns = 6:7,
+    columns = 4:6,
     digits = 1
+  ) |>
+  formatPercentage(
+    columns = "% change",
+    digits = 2
   )
 ```
 
