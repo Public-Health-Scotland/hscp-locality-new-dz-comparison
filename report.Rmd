@@ -1,5 +1,5 @@
 ---
-title: "Comparing HSCP localities based on 2011 and 2022 data zone boundaries"
+title: "Comparing HSCP localities based on 2011 and 2022 datazone boundaries"
 author: PHS Local Intelligence Support Team (LIST)
 output: 
   html_document:
@@ -52,7 +52,7 @@ Datazones are used as the building block to aggregate to HSCP Locality level dat
 
 Following the 2022 Census, the Scottish Government revised Scotland’s datazone boundaries to reflect changes in population distribution and local boundaries.
 
-These changes to datazone boundaries can alter the population and characteristics assigned to each HSCP Locality, even where the locality names and underlying service structures remain unchanged. The purpose of this report is to quantify the impact of moving from HJSCP Localities based on best-fit 2011 datazones to those based on best-fit 2022 datazones.
+These changes to datazone boundaries can alter the population and characteristics assigned to each HSCP Locality, even where the locality names and underlying service structures remain unchanged. The purpose of this report is to quantify the impact of moving from HSCP Localities based on best-fit 2011 datazones to those based on best-fit 2022 datazones.
 
 Further details on datazones can be found [here](https://blogs.gov.scot/statistics/2024/12/16/updates-to-data-zones-and-intermediate-zones-now-published/ "Updates to Data Zones and Intermediate Zones now published - Scottish Government").
 
@@ -130,7 +130,7 @@ digits = 2
 
 # Locality demographics
 
-Changes in locality boundaries may affect not only overall population size but also the age profile and demographic characteristics of an area. This section examines how the transition to 2022 data zones alters the age and sex composition of localities.
+Changes in locality boundaries may affect not only overall population size but also the age profile and demographic characteristics of an area. This section examines how the transition to 2022 datazones alters the age and sex composition of localities.
 
 ```{r}
 
