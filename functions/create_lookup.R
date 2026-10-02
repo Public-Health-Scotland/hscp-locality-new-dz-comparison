@@ -5,9 +5,16 @@
 #' @returns Data.frame with columns datazone2011, hscp_locality, and hscp2019name
 #'
 create_2011_lookup <- function(hscps) {
-  read_rds("/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality/HSCP Localities_DZ11_Lookup_20240513.rds") |>
+  lookup <- read_rds("/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality/HSCP Localities_DZ11_Lookup_20240513.rds") |>
     select(datazone2011, hscp_locality, hscp2019name) |>
     filter(hscp2019name %in% hscps)
+
+  if (!all(hscps %in% lookup$hscp2019name)) {
+    missing <- hscps[!hscps %in% lookup$hscp2019name]
+    stop(str_glue(
+      "'{missing}' HSCP not found in 2011 datazone lookup"
+    ) |> str_c(collapse = "\n  "))
+  }
 }
 
 #' Create HSCP locality lookup for 2022 datazones from returned locality spreadsheets from HSCPs
@@ -30,8 +37,9 @@ create_2022_lookup <- function(hscps, lookup_files = NULL) {
   if (length(missing_files) > 0) {
     stop(
       paste0(
-        "The following lookup file(s) could not be found:\n",
-        paste(missing_files, collapse = "\n")
+        "The following lookup file(s) could not be found:\n\n",
+        paste(missing_files, collapse = "\n"),
+        "\n\nPlease ensure the returned lookup file is named correctly, or provide a path to the file using the lookup_files argument"
       ),
       call. = FALSE
     )

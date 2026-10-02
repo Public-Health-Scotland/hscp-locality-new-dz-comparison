@@ -5,8 +5,16 @@ get_smr_admissions <- function(hscps) {
     col_select = c(hscp2019name, hscp2019)
   )) |>
     distinct() |>
-    filter(hscp2019name %in% hscps) |>
-    pull(hscp2019)
+    filter(hscp2019name %in% hscps)
+
+  if (!all(hscps %in% hscp_code$hscp2019name)) {
+    missing <- hscps[!hscps %in% hscp_code$hscp2019name]
+    stop(str_glue(
+      "No HSCP geography code found for '{missing}'"
+    ) |> str_c(collapse = "\n  "))
+  } else {
+    hscp_code <- hscp_code$hscp2019
+  }
 
   # Set dates
 
