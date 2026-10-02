@@ -14,6 +14,8 @@ create_2011_lookup <- function(hscps) {
     stop(str_glue(
       "'{missing}' HSCP not found in 2011 datazone lookup"
     ) |> str_c(collapse = "\n  "))
+  } else {
+    return(lookup)
   }
 }
 
