@@ -8,7 +8,7 @@ dz_to_locality_pop <- function(dz_pop, lookup, join_by) {
     mutate(
       age_under_18 = rowSums(pick(age0:age17)),
       age_18_to_64 = rowSums(pick(age18:age64)),
-      age_65_plus = rowSums(pick(age64:age90plus)),
+      age_65_plus = rowSums(pick(age65:age90plus)),
       .after = total_pop
     ) %>%
     bind_rows(
