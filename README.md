@@ -5,3 +5,5 @@ To run this report:
 - Open `control.R`
 - Change the `hscps` variable to the names of the HSCPs you wish to include
 - Run the `control.R` script in full
+
+**Please ensure you follow the LIST IG framework when sharing the resulting document.**
