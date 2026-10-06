@@ -48,6 +48,12 @@ dropdown <- function(menu_name, panels){
 }
 ```
 
+::: {.text-danger .p-2 .border .rounded .mt-4 .mb-3}
+[**For Management Information Only – Not for release into the public domain**]{.underline}
+
+This information has been released for management information purposes only. The data have not been adjusted to protect against potential disclosure risks and may contain information which enables (perhaps with the aid of further knowledge of the topic) an individual patient or member of staff to be identified. Please ensure circulation is restricted and that patient confidentiality is not compromised. Please contact [phs.statsgov\@phs.scot](mailto:phs.statsgov@phs.scot "mailto:phs.statsgov@phs.scot") if you have any queries around this or if there is any breach of the terms of the restricted management information.
+:::
+
 Datazones are used as the building block to aggregate to HSCP Locality level data. HSCP Locality boundaries can cross datazones boundaries, and datazones can straddle more than one HSCP locality on the ground. Datazones are assigned to one HSCP Locality, for datazones that cross HSCP localities these are assigned on a “best-fit basis”.
 
 Following the 2022 Census, the Scottish Government revised Scotland’s datazone boundaries to reflect changes in population distribution and local boundaries.
