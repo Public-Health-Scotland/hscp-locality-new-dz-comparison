@@ -20,8 +20,8 @@ dz_to_locality_pop <- function(dz_pop, lookup, join_by) {
     ) |>
     mutate(sex = replace_values(
       sex,
-      "F" ~ "male",
-      "M" ~ "female"
+      "M" ~ "male",
+      "F" ~ "female"
     )) |>
     select(year:age_65_plus) |>
     arrange(year, hscp_locality)
